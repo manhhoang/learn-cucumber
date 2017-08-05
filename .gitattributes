@@ -1,0 +1,2 @@
+export.sh export-ignore
+src/test/java/tests/manual export-ignore

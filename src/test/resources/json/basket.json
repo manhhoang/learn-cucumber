@@ -1,0 +1,17 @@
+{
+    "email": "tom@example.com",
+    "basket": [
+        {
+            "name": "Diamond and Swords Sweater",
+            "image": "http://www.bigtattooplanet.com/store/media/catalog/product/cache/1/small_image/150x150/c96a280f94e22e3ee3823dd0a1a87606/l/i/lizbshoot010913-021-edit.jpg",
+            "price": 35.00,
+            "qty": 1
+        },
+        {
+            "name": "Six Bunnies Hold Fast Pirate Kid's Cap",
+            "image": "http://www.bigtattooplanet.com/store/media/catalog/product/cache/1/thumbnail/82x82/c96a280f94e22e3ee3823dd0a1a87606/s/b/sbcap009.jpg",
+            "price": 12.99,
+            "qty": 1
+        }
+    ]
+}
