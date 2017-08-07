@@ -33,7 +33,7 @@ public class HttpRequestSteps {
 
     @Then("^I see status \"([^\"]*)\" for \"([^\"]*)\"$")
     public void I_see_status(String expectedResponse, String property) throws Throwable {
-        assertThat(app.getLastResponse().contains(String.format(",\"%s\":{\"status\":\"%s\"},", property, expectedResponse)), is(true));
+        assertThat(app.getLastResponse().contains(String.format(",\"%s\":{\"status\":\"%s\",", property, expectedResponse)), is(true));
     }
 
     @Then("^it has status (\\d+)$")
