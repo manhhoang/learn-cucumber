@@ -6,8 +6,7 @@ Feature:
   Background:
     Given a running application
 
-    @pending
-  Scenario:
+  Scenario: get all orders by email
     When I GET "/orders/tom@example.com"
     Then I see JSON like "order-history"
     And it has status 200
