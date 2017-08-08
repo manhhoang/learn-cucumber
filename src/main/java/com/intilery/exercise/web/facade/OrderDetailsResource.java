@@ -1,5 +1,6 @@
 package com.intilery.exercise.web.facade;
 
+import com.intilery.exercise.core.ecommerce.domain.Order;
 import com.intilery.exercise.core.ecommerce.domain.OrderDetail;
 import com.intilery.exercise.core.ecommerce.usecase.GetOrderDetails;
 import org.codehaus.jettison.json.JSONException;
@@ -24,7 +25,12 @@ public class OrderDetailsResource {
     }
 
     @RequestMapping(value = "/{email}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public OrderDetail getOrderDetailsByEmail(@PathVariable("email") String email) throws IOException, JSONException {
+    public OrderDetail getOrderDetailsByEmail(@PathVariable("email") String email) {
         return getOrderDetails.getOrderDetails(email);
+    }
+
+    @RequestMapping(value = "/{email}/{orderID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Order getOrderByID(@PathVariable("email") String email, @PathVariable("orderID") String orderID) {
+        return getOrderDetails.getOrderByID(email, orderID);
     }
 }

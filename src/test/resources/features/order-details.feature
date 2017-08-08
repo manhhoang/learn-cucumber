@@ -12,7 +12,7 @@ Feature:
     And it has status 200
 
     @pending
-  Scenario:
+  Scenario: get order by id
     When I GET "/orders/tom@example.com/ABC2"
     Then I see JSON like "order-abc2"
     And it has status 200
