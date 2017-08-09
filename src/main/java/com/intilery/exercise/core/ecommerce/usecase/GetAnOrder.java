@@ -36,9 +36,13 @@ public class GetAnOrder {
     }
 
     private Order toOrder(final Vertex customer, String orderID) {
-        Order order = new Order();
+        Vertex vertexOrder = getVertexOrder(customer, orderID);
+        Order order = getOrder(vertexOrder, orderID);
         order.setEmail(customer.getProperty("email"));
-        List<OrderLine> lines = new ArrayList<>();
+        return order;
+    }
+
+    private Vertex getVertexOrder(final Vertex customer, String orderID) {
         Queue<Vertex> queue = new LinkedList<>();
         queue.add(customer);
         while (!queue.isEmpty()) {
@@ -48,24 +52,33 @@ public class GetAnOrder {
                 for (final Edge outEdge : edges) {
                     Vertex ver = outEdge.getVertex(IN);
                     if (ver.getProperty("type").equals("order") && ver.getProperty("orderID").equals(orderID)) {
-                        List<Edge> checkouts = (List<Edge>) ver.getEdges(IN);
-                        Set<Edge> products = (HashSet)((HashMap)checkouts.get(0).getVertex(OUT).getEdges(OUT)).get("add to basket");
-                        for (Edge e : products) {
-                            int qty = e.getProperty("qty") != null ? e.getProperty("qty") : 0;
-                            Vertex p = e.getVertex(IN);
-                            String image = p.getProperty("image");
-                            double price = p.getProperty("price");
-                            String name = p.getProperty("name");
-                            OrderLine orderLine = new OrderLine();
-                            orderLine.setName(name);
-                            orderLine.setImage(image);
-                            orderLine.setPrice(price);
-                            orderLine.setQty(qty);
-                            lines.add(orderLine);
-                        }
+                        return ver;
                     }
                     queue.add(outEdge.getVertex(IN));
                 }
+            }
+        }
+        return null;
+    }
+
+    private Order getOrder(Vertex vertexOrder, String orderID) {
+        Order order = new Order();
+        List<OrderLine> lines = new ArrayList<>();
+        List<Edge> checkouts = (List<Edge>) vertexOrder.getEdges(IN);
+        List<Edge> products = (List<Edge>) checkouts.get(0).getVertex(OUT).getEdges(OUT);
+        for (Edge product : products) {
+            if(product.getLabel().equals("add to basket")) {
+                int qty = product.getProperty("qty") != null ? product.getProperty("qty") : 0;
+                Vertex p = product.getVertex(IN);
+                String image = p.getProperty("image");
+                double price = p.getProperty("price");
+                String name = p.getProperty("name");
+                OrderLine orderLine = new OrderLine();
+                orderLine.setName(name);
+                orderLine.setImage(image);
+                orderLine.setPrice(price);
+                orderLine.setQty(qty);
+                lines.add(orderLine);
             }
         }
         OrderLines orderLines = new OrderLines();
