@@ -2,6 +2,7 @@ package com.intilery.exercise.web.facade;
 
 import com.intilery.exercise.core.ecommerce.domain.Order;
 import com.intilery.exercise.core.ecommerce.domain.OrderDetail;
+import com.intilery.exercise.core.ecommerce.usecase.GetAnOrder;
 import com.intilery.exercise.core.ecommerce.usecase.GetOrderDetails;
 import org.codehaus.jettison.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,12 @@ public class OrderDetailsResource {
 
     private final GetOrderDetails getOrderDetails;
 
+    private final GetAnOrder getAnOrder;
+
     @Autowired
-    public OrderDetailsResource(GetOrderDetails getOrderDetails) {
+    public OrderDetailsResource(GetOrderDetails getOrderDetails, GetAnOrder getAnOrder) {
         this.getOrderDetails = getOrderDetails;
+        this.getAnOrder = getAnOrder;
     }
 
     @RequestMapping(value = "/{email}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -31,6 +35,6 @@ public class OrderDetailsResource {
 
     @RequestMapping(value = "/{email}/{orderID}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public Order getOrderByID(@PathVariable("email") String email, @PathVariable("orderID") String orderID) {
-        return getOrderDetails.getOrderByID(email, orderID);
+        return getAnOrder.getOrderByID(email, orderID);
     }
 }
