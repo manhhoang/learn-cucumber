@@ -5,13 +5,14 @@ import com.intilery.exercise.core.ecommerce.domain.OrderDetail;
 import com.intilery.exercise.core.ecommerce.repository.UserGraphRepository;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
+import com.tinkerpop.gremlin.java.GremlinPipeline;
+import com.tinkerpop.pipes.Pipe;
+import com.tinkerpop.pipes.util.iterators.SingleIterator;
+import org.apache.tinkerpop.gremlin.process.traversal.dsl.graph.GraphTraversal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 import static com.tinkerpop.blueprints.Direction.IN;
 import static com.tinkerpop.blueprints.Direction.OUT;
@@ -27,16 +28,35 @@ public class GetOrderDetails {
     }
 
     public OrderDetail getOrderDetails(String email) {
-        Vertex customer = userGraphRepository.getForUser(email);
-        return toOrderDetails(customer);
+        Vertex vCustomer = userGraphRepository.getForUser(email);
+        return toOrderDetailsGemlin(vCustomer);
     }
 
-    private OrderDetail toOrderDetails(final Vertex customer) {
+    private OrderDetail toOrderDetailsGemlin(final Vertex vCustomer) {
+        GremlinPipeline pipe = new GremlinPipeline();
+        pipe.start(vCustomer);
+        Pipe ab = pipe.outV().select();
+        Iterator adf = ab.iterator();
+        while(adf.hasNext()) {
+            Vertex v = (Vertex)adf.next();
+        }
+        List<Vertex> vertices = pipe.outV().select().toList();
+        for(Vertex vertex: vertices) {
+            if(vertex.getProperty("type").equals("order")) {
+
+            }
+        }
+        List<Edge> edges = pipe.toList();
+
+        return null;
+    }
+
+    private OrderDetail toOrderDetails(final Vertex vCustomer) {
         OrderDetail orderDetail = new OrderDetail();
-        orderDetail.setEmail(customer.getProperty("email"));
+        orderDetail.setEmail(vCustomer.getProperty("email"));
         List<Order> orders = new ArrayList<>();
         Queue<Vertex> queue = new LinkedList<>();
-        queue.add(customer);
+        queue.add(vCustomer);
         while (!queue.isEmpty()) {
             Vertex v = queue.poll();
             List<Edge> edges = (List<Edge>) v.getEdges(OUT);
