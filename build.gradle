@@ -74,7 +74,6 @@ dependencies {
     compile("com.google.guava:guava:19.0")
     compile("com.tinkerpop.blueprints:blueprints-core:2.6.0")
     compile("com.tinkerpop.gremlin:gremlin-java:2.6.0")
-    compile("org.apache.tinkerpop:gremlin-core:3.2.4")
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("commons-io:commons-io:2.5")
