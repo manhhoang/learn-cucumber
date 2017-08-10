@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/orders")
-public class OrderResource {
+public class OrderDetailsResource {
 
     private final GetOrders getOrders;
 
     private final GetAnOrder getAnOrder;
 
     @Autowired
-    public OrderResource(GetOrders getOrders, GetAnOrder getAnOrder) {
+    public OrderDetailsResource(GetOrders getOrders, GetAnOrder getAnOrder) {
         this.getOrders = getOrders;
         this.getAnOrder = getAnOrder;
     }

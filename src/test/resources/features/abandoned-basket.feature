@@ -7,7 +7,7 @@ Feature:
     Given a running application
 
     @pending
-  Scenario:
+  Scenario: get abandoned basket
     When I GET "/basket/tom@example.com"
     Then I see JSON like "basket"
     And it has status 200
