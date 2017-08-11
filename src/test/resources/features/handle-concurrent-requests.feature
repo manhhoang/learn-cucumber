@@ -6,7 +6,6 @@ Feature:
   Background:
     Given a running application
 
-    @pending
   Scenario: Handle concurrent processing
     When I POST 100 concurrent requests
     Then I get the count 100 back

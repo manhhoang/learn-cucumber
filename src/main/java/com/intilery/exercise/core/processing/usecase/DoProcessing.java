@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class DoProcessing {
@@ -20,7 +21,7 @@ public class DoProcessing {
     }
 
     public void doLongRunningSerialProcess() {
-        longRunningLockedProcess.doSomething();
+        CompletableFuture.runAsync(() -> longRunningLockedProcess.doSomething());
     }
 
     public Integer doMultiThreadedProcess(String name) {

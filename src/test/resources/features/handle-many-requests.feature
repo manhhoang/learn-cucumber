@@ -6,7 +6,6 @@ Feature:
   Background:
     Given a running application
 
-    @pending
   Scenario:  Handle some processing in serial order
     When I POST 10 serial processes
     Then I get a valid response for each one
