@@ -39,19 +39,18 @@ public class GetAbandonedBaskets {
         List<OrderLine> lines = new ArrayList<>();
         DateTime curCheckOut = getCurrentCheckout(vCustomer);
 
-        GremlinPipeline pipeProduct = new GremlinPipeline();
-        pipeProduct.start(vCustomer);
-        List<Vertex> vProducts = pipeProduct.outE("visit").inV().outE("add to basket").inV().toList();
-        Set<Vertex> vSetProducts = new HashSet<>(vProducts);
-        for(Vertex product: vSetProducts) {
-            if(getAddToBasketTime(product).isAfter(curCheckOut)) {
-                OrderLine orderLine = new OrderLine();
-                orderLine.setName(product.getProperty("name"));
-                orderLine.setImage(product.getProperty("image"));
-                orderLine.setPrice(product.getProperty("price"));
-                orderLine.setQty(getQty(product, curCheckOut));
-                lines.add(orderLine);
-            }
+        GremlinPipeline pipe = new GremlinPipeline();
+        pipe.start(vCustomer);
+        List<Edge> eAddToBaskets = pipe.outE("visit").inV().outE("add to basket").as("basket").property("createdAt")
+                .filter((argument) -> ((DateTime) argument).isAfter(curCheckOut)).back("basket").toList();
+        for(Edge eAddToBasket : eAddToBaskets) {
+            Vertex vProduct = eAddToBasket.getVertex(IN);
+            OrderLine orderLine = new OrderLine();
+            orderLine.setName(vProduct.getProperty("name"));
+            orderLine.setImage(vProduct.getProperty("image"));
+            orderLine.setPrice(vProduct.getProperty("price"));
+            orderLine.setQty(getQty(vProduct, curCheckOut));
+            lines.add(orderLine);
         }
         basketDetail.setBasket(lines);
         return basketDetail;
@@ -77,10 +76,5 @@ public class GetAbandonedBaskets {
             }
         }
         return qty;
-    }
-
-    private DateTime getAddToBasketTime(Vertex product) {
-        List<Edge> eAddToBaskets = (List<Edge>) product.getEdges(IN, "add to basket");
-        return eAddToBaskets.get(0).getProperty("createdAt");
     }
 }
