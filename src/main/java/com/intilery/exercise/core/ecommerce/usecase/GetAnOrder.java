@@ -12,7 +12,10 @@ import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.tinkerpop.blueprints.Direction.IN;
 
@@ -37,26 +40,22 @@ public class GetAnOrder {
         List<OrderLine> lines = new ArrayList<>();
         List<DateTime> checkOutTimes = getCheckOutTimes(vCustomer);
         DateTime curCheckOut = checkOutTimes.get(0);
-        DateTime preCheckOut = null;
-        if(checkOutTimes.size() >= 2) {
-            preCheckOut = checkOutTimes.get(1);
-        }
+        DateTime preCheckOut = checkOutTimes.get(1);
 
         GremlinPipeline pipeProduct = new GremlinPipeline();
         pipeProduct.start(vCustomer);
-        List<Vertex> vProducts = pipeProduct.outE("visit").inV().outE("add to basket").inV().toList();
+        List<Vertex> vProducts = pipeProduct.outE("visit").inV().outE("add to basket").as("basket").property("createdAt")
+                .filter((argument) -> ((DateTime) argument).isAfter(preCheckOut) && ((DateTime) argument).isBefore(curCheckOut))
+                .back("basket").inV().toList();
         Set<Vertex> vSetProducts = new HashSet(vProducts);
-        for(Vertex product: vSetProducts) {
-            if(getAddToBasketTime(product).isAfter(preCheckOut) && getAddToBasketTime(product).isBefore(curCheckOut)) {
-                OrderLine orderLine = new OrderLine();
-                orderLine.setName(product.getProperty("name"));
-                orderLine.setImage(product.getProperty("image"));
-                orderLine.setPrice(product.getProperty("price"));
-                orderLine.setQty(getQty(product, preCheckOut, curCheckOut));
-                lines.add(orderLine);
-            }
+        for (Vertex product : vSetProducts) {
+            OrderLine orderLine = new OrderLine();
+            orderLine.setName(product.getProperty("name"));
+            orderLine.setImage(product.getProperty("image"));
+            orderLine.setPrice(product.getProperty("price"));
+            orderLine.setQty(getQty(product, preCheckOut, curCheckOut));
+            lines.add(orderLine);
         }
-
         OrderLines orderLines = new OrderLines();
         orderLines.setOrderID(orderID);
         orderLines.setLines(lines);
@@ -67,9 +66,9 @@ public class GetAnOrder {
     private int getQty(Vertex product, DateTime preCheckOut, DateTime curCheckOut) {
         List<Edge> eAddToBaskets = (List<Edge>) product.getEdges(IN, "add to basket");
         int qty = 0;
-        for(Edge eAdd: eAddToBaskets) {
+        for (Edge eAdd : eAddToBaskets) {
             DateTime addToBasketTime = eAdd.getProperty("createdAt");
-            if((preCheckOut != null && addToBasketTime.isAfter(preCheckOut) && addToBasketTime.isBefore(curCheckOut))
+            if ((preCheckOut != null && addToBasketTime.isAfter(preCheckOut) && addToBasketTime.isBefore(curCheckOut))
                     || (preCheckOut == null && addToBasketTime.isBefore(curCheckOut))) {
                 qty += (int) eAdd.getProperty("qty");
             }
@@ -84,10 +83,5 @@ public class GetAnOrder {
                 ((DateTime) ((Pair<Edge, Edge>) argument).getB().getProperty("createdAt"))
                         .compareTo(((Pair<Edge, Edge>) argument).getA().getProperty("createdAt"))
         ).property("createdAt").toList();
-    }
-
-    private DateTime getAddToBasketTime(Vertex product) {
-        List<Edge> eAddToBaskets = (List<Edge>) product.getEdges(IN, "add to basket");
-        return eAddToBaskets.get(0).getProperty("createdAt");
     }
 }

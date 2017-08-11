@@ -39,10 +39,9 @@ public class GetAbandonedBaskets {
 
         GremlinPipeline pipe = new GremlinPipeline();
         pipe.start(vCustomer);
-        List<Edge> eAddToBaskets = pipe.outE("visit").inV().outE("add to basket").as("basket").property("createdAt")
-                .filter((argument) -> ((DateTime) argument).isAfter(curCheckOut)).back("basket").toList();
-        for (Edge eAddToBasket : eAddToBaskets) {
-            Vertex vProduct = eAddToBasket.getVertex(IN);
+        List<Vertex> vProducts = pipe.outE("visit").inV().outE("add to basket").as("basket").property("createdAt")
+                .filter((argument) -> ((DateTime) argument).isAfter(curCheckOut)).back("basket").inV().toList();
+        for (Vertex vProduct : vProducts) {
             OrderLine orderLine = new OrderLine();
             orderLine.setName(vProduct.getProperty("name"));
             orderLine.setImage(vProduct.getProperty("image"));
@@ -57,11 +56,10 @@ public class GetAbandonedBaskets {
     private DateTime getCurrentCheckout(final Vertex vCustomer) {
         GremlinPipeline pipe = new GremlinPipeline();
         pipe.start(vCustomer);
-        List<Edge> eCheckOuts = pipe.outE("visit").inV().outE("check out").order((argument) ->
+        return (DateTime) pipe.outE("visit").inV().outE("check out").order((argument) ->
                 ((DateTime) ((Pair<Edge, Edge>) argument).getB().getProperty("createdAt"))
                         .compareTo(((Pair<Edge, Edge>) argument).getA().getProperty("createdAt"))
-        ).toList();
-        return eCheckOuts.get(0).getProperty("createdAt");
+        ).property("createdAt").toList().get(0);
     }
 
     private int getQty(Vertex product, DateTime curCheckOut) {
