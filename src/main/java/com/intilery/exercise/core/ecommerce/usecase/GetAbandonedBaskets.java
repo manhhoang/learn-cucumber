@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static com.tinkerpop.blueprints.Direction.IN;
 
@@ -43,7 +41,7 @@ public class GetAbandonedBaskets {
         pipe.start(vCustomer);
         List<Edge> eAddToBaskets = pipe.outE("visit").inV().outE("add to basket").as("basket").property("createdAt")
                 .filter((argument) -> ((DateTime) argument).isAfter(curCheckOut)).back("basket").toList();
-        for(Edge eAddToBasket : eAddToBaskets) {
+        for (Edge eAddToBasket : eAddToBaskets) {
             Vertex vProduct = eAddToBasket.getVertex(IN);
             OrderLine orderLine = new OrderLine();
             orderLine.setName(vProduct.getProperty("name"));
@@ -60,8 +58,8 @@ public class GetAbandonedBaskets {
         GremlinPipeline pipe = new GremlinPipeline();
         pipe.start(vCustomer);
         List<Edge> eCheckOuts = pipe.outE("visit").inV().outE("check out").order((argument) ->
-                ((DateTime) ((Pair<Edge, Edge>)argument).getB().getProperty("createdAt"))
-                        .compareTo(((Pair<Edge, Edge>)argument).getA().getProperty("createdAt"))
+                ((DateTime) ((Pair<Edge, Edge>) argument).getB().getProperty("createdAt"))
+                        .compareTo(((Pair<Edge, Edge>) argument).getA().getProperty("createdAt"))
         ).toList();
         return eCheckOuts.get(0).getProperty("createdAt");
     }
@@ -69,9 +67,9 @@ public class GetAbandonedBaskets {
     private int getQty(Vertex product, DateTime curCheckOut) {
         List<Edge> eAddToBaskets = (List<Edge>) product.getEdges(IN, "add to basket");
         int qty = 0;
-        for(Edge eAdd: eAddToBaskets) {
+        for (Edge eAdd : eAddToBaskets) {
             DateTime addToBasketTime = eAdd.getProperty("createdAt");
-            if(addToBasketTime.isAfter(curCheckOut)) {
+            if (addToBasketTime.isAfter(curCheckOut)) {
                 qty += (int) eAdd.getProperty("qty");
             }
         }

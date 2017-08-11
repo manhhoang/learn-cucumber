@@ -7,6 +7,7 @@ import com.intilery.exercise.core.ecommerce.repository.UserGraphRepository;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.gremlin.java.GremlinPipeline;
+import com.tinkerpop.pipes.util.structures.Pair;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -34,17 +35,7 @@ public class GetAnOrder {
         Order order = new Order();
         order.setEmail(vCustomer.getProperty("email"));
         List<OrderLine> lines = new ArrayList<>();
-
-        List<DateTime> checkOutTimes = new ArrayList<>();
-        GremlinPipeline pipeOrder = new GremlinPipeline();
-        pipeOrder.start(vCustomer);
-        List<Vertex> vOrders = pipeOrder.outE("visit").inV().outE("check out").inV().toList();
-        for(Vertex vOrder: vOrders) {
-            List<Edge> eCheckOuts = (List<Edge>) vOrder.getEdges(IN, "check out");
-            DateTime checkOutTime = eCheckOuts.get(0).getProperty("createdAt");
-            checkOutTimes.add(checkOutTime);
-        }
-        checkOutTimes.sort(Comparator.reverseOrder());
+        List<DateTime> checkOutTimes = getCheckOutTimes(vCustomer);
         DateTime curCheckOut = checkOutTimes.get(0);
         DateTime preCheckOut = null;
         if(checkOutTimes.size() >= 2) {
@@ -84,6 +75,15 @@ public class GetAnOrder {
             }
         }
         return qty;
+    }
+
+    private List<DateTime> getCheckOutTimes(final Vertex vCustomer) {
+        GremlinPipeline pipe = new GremlinPipeline();
+        pipe.start(vCustomer);
+        return (List<DateTime>) pipe.outE("visit").inV().outE("check out").order((argument) ->
+                ((DateTime) ((Pair<Edge, Edge>) argument).getB().getProperty("createdAt"))
+                        .compareTo(((Pair<Edge, Edge>) argument).getA().getProperty("createdAt"))
+        ).property("createdAt").toList();
     }
 
     private DateTime getAddToBasketTime(Vertex product) {
