@@ -12,6 +12,7 @@ import java.util.Map;
 public class DoProcessing {
     private final LongRunningLockedProcess longRunningLockedProcess;
     private final Map<String, Integer> map = Collections.synchronizedMap(new HashMap<String, Integer>());
+    private final Object lock = new Object();
 
     @Autowired
     public DoProcessing(LongRunningLockedProcess longRunningLockedProcess) {
@@ -23,11 +24,17 @@ public class DoProcessing {
     }
 
     public Integer doMultiThreadedProcess(String name) {
-        if (!map.containsKey(name)) {
-            map.put(name, 1);
-        } else {
-            map.put(name, map.get(name) + 1);
+        synchronized (lock) {
+            if (!map.containsKey(name)) {
+                map.put(name, 1);
+            } else {
+                map.put(name, map.get(name) + 1);
+            }
         }
         return map.get(name);
+    }
+
+    public Map<String, Integer> getMap() {
+        return map;
     }
 }

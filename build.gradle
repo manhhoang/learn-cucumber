@@ -83,4 +83,6 @@ dependencies {
     testCompile("info.cukes:cucumber-java:${cucumberVersion}")
     testCompile("info.cukes:cucumber-junit:${cucumberVersion}")
     testCompile("info.cukes:cucumber-spring:${cucumberVersion}")
+    testCompile group: 'org.mockito', name: 'mockito-all', version: '1.9.5'
+
 }
