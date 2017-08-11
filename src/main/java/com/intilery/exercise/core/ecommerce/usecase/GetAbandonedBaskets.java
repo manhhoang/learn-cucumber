@@ -6,11 +6,15 @@ import com.intilery.exercise.core.ecommerce.repository.UserGraphRepository;
 import com.tinkerpop.blueprints.Edge;
 import com.tinkerpop.blueprints.Vertex;
 import com.tinkerpop.gremlin.java.GremlinPipeline;
+import com.tinkerpop.pipes.util.structures.Pair;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static com.tinkerpop.blueprints.Direction.IN;
 
@@ -35,22 +39,18 @@ public class GetAbandonedBaskets {
 
         List<OrderLine> lines = new ArrayList<>();
 
-        List<DateTime> checkOutTimes = new ArrayList<>();
         GremlinPipeline pipeOrder = new GremlinPipeline();
         pipeOrder.start(vCustomer);
-        List<Vertex> vOrders = pipeOrder.outE("visit").inV().outE("check out").inV().toList();
-        for(Vertex vOrder: vOrders) {
-            List<Edge> eCheckOuts = (List<Edge>) vOrder.getEdges(IN, "check out");
-            DateTime checkOutTime = eCheckOuts.get(0).getProperty("createdAt");
-            checkOutTimes.add(checkOutTime);
-        }
-        checkOutTimes.sort(Comparator.reverseOrder());
-        DateTime curCheckOut = checkOutTimes.get(0);
+        List<Edge> eCheckOuts = pipeOrder.outE("visit").inV().outE("check out").order((argument) ->
+                ((DateTime) ((Pair<Edge, Edge>)argument).getB().getProperty("createdAt"))
+                        .compareTo(((Pair<Edge, Edge>)argument).getA().getProperty("createdAt"))
+        ).toList();
+        DateTime curCheckOut = eCheckOuts.get(0).getProperty("createdAt");
 
         GremlinPipeline pipeProduct = new GremlinPipeline();
         pipeProduct.start(vCustomer);
         List<Vertex> vProducts = pipeProduct.outE("visit").inV().outE("add to basket").inV().toList();
-        Set<Vertex> vSetProducts = new HashSet(vProducts);
+        Set<Vertex> vSetProducts = new HashSet<>(vProducts);
         for(Vertex product: vSetProducts) {
             if(getAddToBasketTime(product).isAfter(curCheckOut)) {
                 OrderLine orderLine = new OrderLine();
