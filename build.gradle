@@ -19,7 +19,7 @@ configurations {
 }
 
 jar {
-    baseName = 'com.intilery.exercise'
+    baseName = 'com.jd.tinkerpop'
     version = '0.1.0'
 }
 

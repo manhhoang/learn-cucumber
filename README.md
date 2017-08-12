@@ -1,9 +1,9 @@
-# Learn Cucumber 
+# Learn TinkerPop 
 
 ## Running...
 
 You can build a jar file with `gradle build`, then run it with `java -jar build/libs/com.jd.gradle-0.1.0.jar`,
-alternatively use `gradle bootRun` to use the spring boot runner (the terminal will hang whilst this runs, stop with `CTRL-C`).
+alternatively use `gradle bootRun` to use the spring boot runner.
 
 You can see the running application at `http://localhost:8080/hello-world`.
 

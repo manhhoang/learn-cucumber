@@ -1,6 +1,6 @@
 package features;
 
-import com.intilery.exercise.web.ExerciseApplication;
+import com.jd.tinkerpop.web.ExerciseApplication;
 import cucumber.api.junit.Cucumber;
 import org.junit.runner.RunWith;
 import org.springframework.boot.SpringApplication;
