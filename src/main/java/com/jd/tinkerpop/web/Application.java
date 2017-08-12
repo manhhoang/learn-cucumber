@@ -6,8 +6,8 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan({"com.jd.tinkerpop.*"})
-public class ExerciseApplication {
+public class Application {
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(ExerciseApplication.class, args);
+        SpringApplication.run(Application.class, args);
     }
 }
