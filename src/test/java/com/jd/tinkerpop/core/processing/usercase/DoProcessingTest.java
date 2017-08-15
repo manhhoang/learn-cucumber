@@ -25,7 +25,7 @@ public class DoProcessingTest {
 
     @Test
     public void testDoMultiThreadedProcess() throws Exception {
-        final int numberThreads = 100;
+        final int numberThreads = 1000;
         final ExecutorService executorService = Executors.newFixedThreadPool(numberThreads);
         final CountDownLatch allExecutorThreadsReady = new CountDownLatch(numberThreads);
         final CountDownLatch afterInitBlocker = new CountDownLatch(1);
@@ -48,6 +48,6 @@ public class DoProcessingTest {
         afterInitBlocker.countDown();
         allDone.await(30, TimeUnit.SECONDS);
         executorService.shutdownNow();
-        assertEquals("100", doProcessing.getMap().get("TaskName").toString());
+        assertEquals("1000", doProcessing.getMap().get("TaskName").toString());
     }
 }

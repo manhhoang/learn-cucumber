@@ -7,5 +7,5 @@ Feature:
     Given a running application
 
   Scenario: Handle concurrent processing
-    When I POST 100 concurrent requests
-    Then I get the count 100 back
+    When I POST 1000 concurrent requests
+    Then I get the count 1000 back
