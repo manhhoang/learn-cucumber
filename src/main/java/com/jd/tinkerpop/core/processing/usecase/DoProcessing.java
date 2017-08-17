@@ -24,8 +24,7 @@ public class DoProcessing {
 
     public Integer doMultiThreadedProcess(String name) {
         map.putIfAbsent(name, 0);
-        map.merge(name, 1, Integer::sum);
-        return map.get(name);
+        return map.merge(name, 1, Integer::sum);
     }
 
     public Map<String, Integer> getMap() {
